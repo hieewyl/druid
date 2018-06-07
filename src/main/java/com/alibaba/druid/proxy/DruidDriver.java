@@ -207,46 +207,63 @@ public class DruidDriver implements Driver, DruidDriverMBean {
     }
 
     public static DataSourceProxyConfig parseConfig(String url, Properties info) throws SQLException {
+
+        // 去除掉 jdbc:wrap-jdbc:
         String restUrl = url.substring(DEFAULT_PREFIX.length());
 
+        //new一个配置代理
         DataSourceProxyConfig config = new DataSourceProxyConfig();
 
+        //是否以 driver= 打头
         if (restUrl.startsWith(DRIVER_PREFIX)) {
+            //从 driver= 后面寻找 [:]
             int pos = restUrl.indexOf(':', DRIVER_PREFIX.length());
+            //找到 [:]前的部分即 DriverClassName
             String driverText = restUrl.substring(DRIVER_PREFIX.length(), pos);
             if (driverText.length() > 0) {
                 config.setRawDriverClassName(driverText.trim());
             }
+            //restUrl设置成DriverClassName后面的链接字符串
             restUrl = restUrl.substring(pos + 1);
         }
 
+        // 是否以 filters= 打头
         if (restUrl.startsWith(FILTERS_PREFIX)) {
             int pos = restUrl.indexOf(':', FILTERS_PREFIX.length());
             String filtersText = restUrl.substring(FILTERS_PREFIX.length(), pos);
+            //根据逗号分隔多个filter,实例化filter，添加到config的Filter列表中
             for (String filterItem : filtersText.split(",")) {
                 FilterManager.loadFilter(config.getFilters(), filterItem);
             }
+            //filter后面部分
             restUrl = restUrl.substring(pos + 1);
         }
 
+        // 是否以 name= 打头
         if (restUrl.startsWith(NAME_PREFIX)) {
             int pos = restUrl.indexOf(':', NAME_PREFIX.length());
             String name = restUrl.substring(NAME_PREFIX.length(), pos);
+            //设置name
             config.setName(name);
             restUrl = restUrl.substring(pos + 1);
         }
 
+        // 是否以 jmx= 打头
         if (restUrl.startsWith(JMX_PREFIX)) {
             int pos = restUrl.indexOf(':', JMX_PREFIX.length());
             String jmxOption = restUrl.substring(JMX_PREFIX.length(), pos);
+            //设置 jmx
             config.setJmxOption(jmxOption);
             restUrl = restUrl.substring(pos + 1);
         }
 
+        //设置原生连接字符串
         String rawUrl = restUrl;
         config.setRawUrl(rawUrl);
 
+        //如没有 driver= 的配置则需要从 原生字符串中提取DriverClassName
         if (config.getRawDriverClassName() == null) {
+            //根据连接字符串的前缀取得对应的厂商驱动
             String rawDriverClassname = JdbcUtils.getDriverClassName(rawUrl);
             config.setRawDriverClassName(rawDriverClassname);
         }

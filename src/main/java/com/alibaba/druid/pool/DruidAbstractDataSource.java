@@ -67,7 +67,8 @@ import com.alibaba.druid.util.*;
  * @author wenshao [szujobs@hotmail.com]
  * @author ljw [ljw2083@alibaba-inc.com]
  */
-public abstract class DruidAbstractDataSource extends WrapperAdapter implements DruidAbstractDataSourceMBean, DataSource, DataSourceProxy, Serializable {
+public abstract class DruidAbstractDataSource extends WrapperAdapter
+        implements DruidAbstractDataSourceMBean, DataSource, DataSourceProxy, Serializable {
     private static final long                          serialVersionUID                          = 1L;
     private final static Log                           LOG                                       = LogFactory.getLog(DruidAbstractDataSource.class);
 
@@ -268,7 +269,6 @@ public abstract class DruidAbstractDataSource extends WrapperAdapter implements 
 
     public DruidAbstractDataSource(boolean lockFair){
         lock = new ReentrantLock(lockFair);
-
         notEmpty = lock.newCondition();
         empty = lock.newCondition();
     }
@@ -1553,6 +1553,7 @@ public abstract class DruidAbstractDataSource extends WrapperAdapter implements 
     protected abstract void recycle(DruidPooledConnection pooledConnection) throws SQLException;
 
     public Connection createPhysicalConnection(String url, Properties info) throws SQLException {
+
         Connection conn;
         if (getProxyFilters().size() == 0) {
             conn = getDriver().connect(url, info);

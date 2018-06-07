@@ -36,6 +36,23 @@ public class FilterManager {
 
     private static final ConcurrentHashMap<String, String> aliasMap = new ConcurrentHashMap<String, String>(16, 0.75f, 1);
 
+
+    /**
+     去除 key的 druid.filters. 前缀
+     default=com.alibaba.druid.filter.stat.StatFilter
+     stat=com.alibaba.druid.filter.stat.StatFilter
+     mergeStat=com.alibaba.druid.filter.stat.MergeStatFilter
+     counter=com.alibaba.druid.filter.stat.StatFilter
+     encoding=com.alibaba.druid.filter.encoding.EncodingConvertFilter
+     log4j=com.alibaba.druid.filter.logging.Log4jFilter
+     log4j2=com.alibaba.druid.filter.logging.Log4j2Filter
+     slf4j=com.alibaba.druid.filter.logging.Slf4jLogFilter
+     commonlogging=com.alibaba.druid.filter.logging.CommonsLogFilter
+     commonLogging=com.alibaba.druid.filter.logging.CommonsLogFilter
+     wall=com.alibaba.druid.wall.WallFilter
+     config=com.alibaba.druid.filter.config.ConfigFilter
+
+     */
     static {
         try {
             Properties filterProperties = loadFilterConfig();
@@ -58,6 +75,7 @@ public class FilterManager {
 
         String filter = aliasMap.get(alias);
 
+        //如果没取到并且alisa比较短，直接返回alias
         if (filter == null && alias.length() < 128) {
             filter = alias;
         }
@@ -76,6 +94,22 @@ public class FilterManager {
         return filterProperties;
     }
 
+    /**
+     * 默认读取这么多的Filter配置
+     druid.filters.default=com.alibaba.druid.filter.stat.StatFilter
+     druid.filters.stat=com.alibaba.druid.filter.stat.StatFilter
+     druid.filters.mergeStat=com.alibaba.druid.filter.stat.MergeStatFilter
+     druid.filters.counter=com.alibaba.druid.filter.stat.StatFilter
+     druid.filters.encoding=com.alibaba.druid.filter.encoding.EncodingConvertFilter
+     druid.filters.log4j=com.alibaba.druid.filter.logging.Log4jFilter
+     druid.filters.log4j2=com.alibaba.druid.filter.logging.Log4j2Filter
+     druid.filters.slf4j=com.alibaba.druid.filter.logging.Slf4jLogFilter
+     druid.filters.commonlogging=com.alibaba.druid.filter.logging.CommonsLogFilter
+     druid.filters.commonLogging=com.alibaba.druid.filter.logging.CommonsLogFilter
+     druid.filters.wall=com.alibaba.druid.wall.WallFilter
+     druid.filters.config=com.alibaba.druid.filter.config.ConfigFilter
+
+     */
     private static void loadFilterConfig(Properties filterProperties, ClassLoader classLoader) throws IOException {
         if (classLoader == null) {
             return;
@@ -107,10 +141,12 @@ public class FilterManager {
 
         if (filterClassNames != null) {
             for (String filterClassName : filterClassNames.split(",")) {
+                //是否已经实例化过?
                 if (existsFilter(filters, filterClassName)) {
                     continue;
                 }
 
+                //不存在与 Filters 列表里的 filter需要手动加载，并添加到列表中
                 Class<?> filterClass = Utils.loadClass(filterClassName);
 
                 if (filterClass == null) {

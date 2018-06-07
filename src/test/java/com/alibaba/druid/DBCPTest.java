@@ -30,7 +30,6 @@ public class DBCPTest extends TestCase {
         Class.forName("com.alibaba.druid.mock.MockDriver");
         
         final BasicDataSource dataSource = new BasicDataSource();
-//        final DruidDataSource dataSource = new DruidDataSource();
         dataSource.setInitialSize(3);
         dataSource.setMaxActive(20);
         dataSource.setMaxIdle(20);
@@ -64,8 +63,7 @@ public class DBCPTest extends TestCase {
         startLatch.countDown();
         
         endLatch.await();
-        
-//        System.out.println(dataSource.getNumIdle());
+
         System.out.println(MockDriver.instance.getConnections().size());
         System.out.println(MockDriver.instance.getConnectionCloseCount());
     }

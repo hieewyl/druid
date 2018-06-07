@@ -17,23 +17,28 @@ package com.alibaba.druid;
 
 import java.util.LinkedHashMap;
 
+import com.alibaba.druid.pool.DruidConnectionHolder;
+import com.alibaba.druid.pool.PreparedStatementHolder;
 import junit.framework.TestCase;
 
 public class TestLRU extends TestCase {
 
     public void test_lru() throws Exception {
-        LinkedHashMap<Integer, Object> cache = new LinkedHashMap<Integer, Object>(100, 0.75f, true);
-
-        cache.put(2, "22");
-        cache.put(3, "33");
-
-        System.out.println(cache);
-
-        cache.put(2, "22");
-
-        System.out.println(cache);
-        cache.get(3);
-        System.out.println(cache);
+//        LinkedHashMap<Integer, Object> cache = new LinkedHashMap<Integer, Object>(100, 0.75f, true);
+//
+//        cache.put(2, "22");
+//        cache.put(3, "33");
+//
+//        System.out.println(cache);
+//
+//        cache.put(2, "22");
+//
+//        System.out.println(cache);
+//        cache.get(3);
+//        System.out.println(cache);
+        for (int i = 0; i < 10; ++i) {
+            System.out.println(i);
+        }
 
     }
 }
